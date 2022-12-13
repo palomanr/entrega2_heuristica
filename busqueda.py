@@ -24,7 +24,7 @@ def distribution_cost(distribution: dict):
             cost_dict[current] = 3
             same_dict[current] = 0
 
-    print("INICIAL COST DICTIONARY: ", cost_dict)
+    print("INITIAL COST DICTIONARY: ", cost_dict)
 
     for index in range(0, len_distribution):
 
