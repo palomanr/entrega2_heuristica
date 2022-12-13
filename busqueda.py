@@ -1,75 +1,86 @@
-
 # Example of input -> {’3XX’: 11, ’1CX’: 12, ’6XX’: 15, ’5XX’: 16} -> Position 0 is front of the line
 # Function calculates the cost with current distribution
 def distribution_cost(distribution: dict):
     cost = 0
     distribution_keys = list(distribution.keys())
-    for index in range(0, len(distribution)):
+    len_distribution = len(distribution)
+    cost_dict = {}
+    same_dict = {}
 
-        # Nonconflictive student with reduced mobility
-        if distribution_keys[index][1] == "X" and distribution_keys[index][2] == "R":
-            cost += 3  # Cost for the reduced mobility
-            cost += 3  # Cost for student behind him
-            index += check_if_range_index(index, distribution)  # Saltando el alumno siguiente
+    # We create dictionary with all the initial costs
+    for current in distribution_keys:
+        if current[1:] == "XX":
+            cost_dict[current] = 1
+            same_dict[current] = 0
+        elif current[1:] == "XR":
+            cost_dict[current] = 3
+            same_dict[current] = 0
+        elif current[1:] == "CX":
+            cost_dict[current] = 1
+            same_dict[current] = 0
+        elif current[1:] == "CR":
+            cost_dict[current] = 3
+            same_dict[current] = 0
 
-        # Nonconflictive student without reduced mobility
-        elif distribution_keys[index][1] == "X" and distribution_keys[index][2] == "X":
-            cost += 1
+    for index in range(0, len_distribution):
 
-        # Conflictive student without reduced mobility
-        elif distribution_keys[index][1] == "C" and distribution_keys[index][2] == "X":
-            cost += 1  # Cost for conflictive student
-            student_front = distribution_keys[check_if_range_front(index, distribution)]
-            student_back = distribution_keys[check_if_range_back(index, distribution)]
+        # Get current student key
+        current = distribution_keys[index]
 
-            # If student behind has reduced mobility
-            if student_front[2] == "R" and student_front != "ERROR":
-                cost += 3  # Duplicates the cost of student_behind
-                cost += 3  # Also duplicates the cost of person helping student_behind
+        # If current student is non-problematic and has reduced mobility
+        if current[1:] == "XR":
 
-            # If student behind doesn't have reduced mobility
+            # Get student behind, he has to exist because current has reduced mobility
+            student_behind = distribution_keys[index+1]
+
+            if student_behind == "CX":
+                cost_dict[current] = cost_dict[current] * 2  # Current student cost multiplied by two
+                cost_dict[student_behind] = cost_dict[student_behind]  # Student behind has to have same cost as current
+
+                # Linking both students time
+                same_dict[current] = 1
+                same_dict[student_behind] = 1
+
             else:
-                cost += 2
+                cost_dict[distribution_keys[index+1]] = cost_dict[distribution_keys[index]]  # Student behind has the same cost as current
 
-            # If student in front has reduced mobility
-            if student_back[2] == "R" and student_back != "ERROR":
-                cost += 6  # Duplicates the cost of student in front
-                cost += 5  # Conflictive student needs to have same cost
-                index += check_if_range_index(index, distribution)  # Skip next student
+        elif current[1:] == "CX":
 
-            # If student in front doesn't have reduced mobility
-            else:
-                cost += 2  # Duplicates cost of student
-                index += check_if_range_index(index, distribution) # Skip next student
+            # Checking if indexes in range
+            front_exist = (index-1) in range(0, len_distribution)
+            behind_exist = (index + 1) in range(0, len_distribution)
 
-    return cost
+            if front_exist:
+                # Getting student in front
+                student_front = distribution_keys[index - 1]
+                cost_dict[student_front] = cost_dict[student_front] * 2 # Student front cost multiplied by two
 
-def check_if_range_index(index, distribution):
-    length = len(distribution)
-    if index+1 <= length:
-        return 1
-    return 0
+            if behind_exist:
+                # Getting student behind
+                student_behind = distribution_keys[index + 1]
+                cost_dict[student_behind] = cost_dict[student_behind] * 2 # Student front cost multiplied by two
 
-def check_if_range_back(index, distribution):
-    length = len(distribution)
-    if index + 1 <= length:
-        return index + 1
-    return "ERROR"
+            elif current[1:] == "CR":
+                # Checking if indexes in range, student being has to exist
+                front_exist = (index - 1) in range(0, len_distribution)
 
-def check_if_range_front(index, distribution):
-    length = len(distribution)
-    if index - 1 >= 0:
-        return index - 1
-    return "ERROR"
+                if front_exist:
+                    # Getting student in front
+                    student_front = distribution_keys[index - 1]
+                    cost_dict[student_front] = cost_dict[student_front] * 2  # Student front cost multiplied by two
 
+                # Multiplied student behind cost by two
+                student_behind = distribution_keys[index + 1]
+                cost_dict[student_behind] = cost_dict[student_behind] * 2  # Student front cost multiplied by two
 
-
-
-
+                # Linking all three students
+                same_dict[current] = 1
+                same_dict[student_behind] = 1
+                same_dict[student_front] = 1
 
 
 
+        return
 
-print(distribution_cost({"3XX": 11, "1CX": 12, "6XX": 15, "5XX": 16}))
 
-#print(distribution_cost({"6XX":15, "3XX":11, "1CX":12, "7CX":32}))
+
