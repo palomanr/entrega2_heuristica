@@ -11,20 +11,20 @@ def distribution_cost(distribution: dict):
 
     # We create dictionary with all the initial costs
     for current in distribution_keys:
-        if current[1:] == "XX":
+        if current[-2:] == "XX":
             cost_dict[current] = 1
             same_dict[current] = 0
-        elif current[1:] == "XR":
+        elif current[-2:] == "XR":
             cost_dict[current] = 3
             same_dict[current] = 0
-        elif current[1:] == "CX":
+        elif current[-2:] == "CX":
             cost_dict[current] = 1
             same_dict[current] = 0
-        elif current[1:] == "CR":
+        elif current[-2:] == "CR":
             cost_dict[current] = 3
             same_dict[current] = 0
 
-    print(cost_dict)
+    print("INICIAL COST DICTIONARY: ", cost_dict)
 
     for index in range(0, len_distribution):
 
@@ -32,7 +32,7 @@ def distribution_cost(distribution: dict):
         current = distribution_keys[index]
 
         # If current student is non-problematic and has reduced mobility
-        if current[1:] == "XR":
+        if current[-2:] == "XR":
 
             # Get student behind, he has to exist because current has reduced mobility
             student_behind = distribution_keys[index+1]
@@ -42,7 +42,7 @@ def distribution_cost(distribution: dict):
             same_dict[current] = random_num
             same_dict[student_behind] = random_num
 
-        elif current[1:] == "CX":
+        elif current[-2:] == "CX":
 
             # Checking if indexes in range
             front_exist = (index-1) in range(0, len_distribution)
@@ -58,20 +58,7 @@ def distribution_cost(distribution: dict):
                 student_behind = distribution_keys[index + 1]
                 cost_dict[student_behind] = cost_dict[student_behind] * 2  # Student front cost multiplied by two
 
-            # Duplicating costs for every student behind current with a seat number higher than current
-            # We skip two
-            if index + 2 <= len_distribution:
-                for aux in range(index + 2, len_distribution):
-                    new_current_key = distribution_keys[aux]
-
-                    # Checking if there is a student behind
-                    two_behind_exist = (index + 1) in range(0, len_distribution)
-
-                    # If student behind exists and his seat has a higher number multiply cost by two
-                    if two_behind_exist and distribution[new_current_key] > distribution[current]:
-                        cost_dict[new_current_key] = cost_dict[new_current_key] * 2
-
-        elif current[1:] == "CR":
+        elif current[-2:] == "CR":
             # Checking if indexes in range, student being has to exist
             front_exist = (index - 1) in range(0, len_distribution)
 
@@ -89,6 +76,7 @@ def distribution_cost(distribution: dict):
             same_dict[current] = random_num
             same_dict[student_behind] = random_num
 
+        if current[-2] == "C":
             # Duplicating costs for every student behind current with a seat number higher than current
             # We skip two
             if index + 2 <= len_distribution:
@@ -102,8 +90,7 @@ def distribution_cost(distribution: dict):
                     if two_behind_exist and distribution[new_current_key] > distribution[current]:
                         cost_dict[new_current_key] = cost_dict[new_current_key] * 2
 
-    print(cost_dict)
-    print(same_dict)
+    print("SAME VALUES DICTIONARY: ", same_dict)
 
     read = []
     same_dict_list = list(same_dict.keys())
@@ -133,12 +120,12 @@ def distribution_cost(distribution: dict):
     for current in cost_list:
         total_cost += current
 
-    print(cost_dict)
-    print(same_dict)
+    print("FINAL COST DICTIONARY: ", cost_dict)
 
     return total_cost
 
-print(distribution_cost({"3XX": 11, "1CX": 12, "6XX": 15, "5XX": 16, "6XR": 17, "7XX": 18}))
+
+print(distribution_cost({"3XX": 11, "1CX": 12, "6XX": 15, "5XX": 7, "6XR": 17, "7XX": 18}))
 
 
 
