@@ -24,7 +24,7 @@ def distribution_cost(distribution: dict):
             cost_dict[current] = 3
             same_dict[current] = 0
 
-    print("INITIAL COST DICTIONARY: ", cost_dict)
+    #print("INITIAL COST DICTIONARY: ", cost_dict)
 
     for index in range(0, len_distribution):
 
@@ -90,10 +90,10 @@ def distribution_cost(distribution: dict):
                     if two_behind_exist and distribution[new_current_key] > distribution[current]:
                         cost_dict[new_current_key] = cost_dict[new_current_key] * 2
 
-    print("SAME VALUES DICTIONARY: ", same_dict)
+    #print("SAME VALUES DICTIONARY: ", same_dict)
 
-    read = []
     same_dict_list = list(same_dict.keys())
+    read = []
 
     # Making linked values the same, highest value
     for index in range(0, len(same_dict_list)):
@@ -102,16 +102,15 @@ def distribution_cost(distribution: dict):
         current_key_same = same_dict[current_key]
 
         if current_key_same != 0 and (current_key_same not in read):
-            for new_index in range(index, len(same_dict_list)):
-                new_current_key = same_dict_list[new_index]
-                new_current_key_same = same_dict[new_current_key]
-                if new_current_key_same == current_key_same:
-                    new_current_key_cost = cost_dict[new_current_key]
-                    read.append(current_key_same)
+            new_current_key = same_dict_list[index+1]
+            new_current_key_same = same_dict[new_current_key]
+            new_current_key_cost = cost_dict[new_current_key]
 
             max_value = max(current_key_cost, new_current_key_cost)
             cost_dict[current_key] = max_value
             cost_dict[new_current_key] = max_value
+
+            read.append(current_key_same)
             del cost_dict[current_key]
 
     cost_list = list(cost_dict.values())
@@ -121,12 +120,12 @@ def distribution_cost(distribution: dict):
     for current in cost_list:
         total_cost += current
 
-    print("FINAL COST DICTIONARY: ", cost_dict)
+    #print("FINAL COST DICTIONARY: ", cost_dict)
 
     return total_cost
 
 
-print(distribution_cost({"3XX": 11, "1CX": 12, "6XX": 15, "5XX": 7, "6XR": 17, "7XX": 18}))
+print(distribution_cost({"3XX": 11, "1CR": 15, "6XX": 15, "5XX": 20, "6XX": 17, "7XX": 18}))
 
 
 
