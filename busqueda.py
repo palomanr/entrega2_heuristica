@@ -112,6 +112,7 @@ def distribution_cost(distribution: dict):
             max_value = max(current_key_cost, new_current_key_cost)
             cost_dict[current_key] = max_value
             cost_dict[new_current_key] = max_value
+            del cost_dict[current_key]
 
     cost_list = list(cost_dict.values())
     total_cost = 0
