@@ -1,5 +1,6 @@
 # Example of input -> {"3XX": 11, "1CX": 12, "6XX": 15, "5XX": 16} -> Position 0 is front of the line
 # Function calculates the cost with current distribution
+# Autores:
 from random import randint
 
 
