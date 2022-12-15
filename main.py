@@ -36,6 +36,7 @@ if __name__ == '__main__':
     tiempo_total = end - start
     print("\nTiempo total: ", tiempo_total)
     # Calculando e imprimiendo coste total con otra función heurística
-    print("\nCoste Total: ", Calcular_g2.calculate(grafo.a_estrella().a_dict()))
+    print("\nCoste de cola inicial: ", Calcular_g2.calculate(leer_entrada(os.getcwd() + "/test")))
+    print("\nCoste de cola optimizada: ", Calcular_g2.calculate(grafo.a_estrella().a_dict()))
 
 
