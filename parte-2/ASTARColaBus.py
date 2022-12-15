@@ -1,12 +1,14 @@
+"""PARTE 2 CODIGO"""
 import datetime
 import sys
 
 
 class Alumno:
-    def __init__(self, clave, asiento):
-        self.id = int(clave[0:-2])
-        self.conflictivo = clave[-2] == 'C'
-        self.movilidad_reducida = clave[-1] == 'R'
+    """CLASE CON LA QUE DEFINIMOS A LOS ALUMNOS, SUS ID Y CARACTERISTICAS"""
+    def __init__(self, id, asiento):
+        self.id = int(id[0:-2])
+        self.conflictivo = id[-2] == 'C'
+        self.movilidad_reducida = id[-1] == 'R'
         self.asiento = asiento
 
     def __eq__(self, other):
@@ -23,7 +25,7 @@ class Alumno:
 
     @property
     def clave(self):
-        """ Propiedad que retorna un str con la clave del diccionario del alumno. """
+        """ devuelve la id del diccionario del alumno. """
         clave = str(self.id)
         if self.conflictivo:
             clave += 'C'
@@ -37,15 +39,16 @@ class Alumno:
 
 
 class Estado:
-    def __init__(self, cola: list = None, sin_asignar: list = None, profundidad: int = 0, heuristica: int = 0):
+    """CON ESTA CLASE DEFINIMOS LOS ESTADOS"""
+    def __init__(self, cola: list = None, por_asignar: list = None, profundidad: int = 0, heuristica: int = 0):
         if cola is None:
             self.cola = []
         else:
             self.cola = cola
-        if sin_asignar is None:
-            self.sin_asignar = []
+        if por_asignar is None:
+            self.por_asignar = []
         else:
-            self.sin_asignar = sin_asignar
+            self.por_asignar = por_asignar
         self.profundidad = profundidad
         self.g = self.calcular_g()
         self.h = self.calcular_h(heuristica)
@@ -70,33 +73,36 @@ class Estado:
         return self.f >= other.f
 
     def calcular_g(self) -> int:
-        """ Metodo que devuelve el peso del estado. """
-        costes = [1] * len(self.cola)
-        conflictivos = []
+        """ PARA CONSEGUIR EL COSTE DE MOVER DE UN ESTADO A OTRO """
+        alumnos_conflictivos = []
+        cost_list = [1] * len(self.cola)
         for i in range(len(self.cola)):
-            # Recorrer los conflictivos que han entrado. Duplican el tiempo del alumno actual si este se sienta atras.
-            for j in conflictivos:
+            # los alumnols conflictivos duplican el tiempo del alumno actual si se sienta atras.
+            for j in alumnos_conflictivos:
                 if self.cola[i].asiento > j.asiento:
-                    costes[i] *= 2
-            # Si es conflictivo, anadirlo a los conflictivos.
+                    cost_list[i] *= 2
+            # Si es conflictivo, anadirlo a los alumnos_conflictivos.
             if self.cola[i].conflictivo:
-                conflictivos.append(self.cola[i])
+                alumnos_conflictivos.append(self.cola[i])
             # Si el anterior es conflictivo, duplicar el coste.
             if i > 0 and self.cola[i - 1].conflictivo:
-                costes[i] *= 2
+                cost_list[i] *= 2
             # Si el siguiente es conflictivo, duplicar el coste.
             if i + 1 < len(self.cola) and self.cola[i + 1].conflictivo:
-                costes[i] *= 2
+                cost_list[i] *= 2
             # Si el actual es de movilidad reducida, triplicar el coste.
             if self.cola[i].movilidad_reducida:
-                costes[i] *= 3
-        # Si se ayuda a un alumno con movilidad reducida, los costes se multiplican y se anula el del acompanante.
+                cost_list[i] *= 3
+        # Si se ayuda a un alumno con movilidad reducida, los cost_list se multiplican y se anula el que tiene el ayudante.
         for i in range(len(self.cola)):
             if self.cola[i].movilidad_reducida and i + 1 < len(self.cola):
-                costes[i] *= costes[i + 1]
-                costes[i + 1] = 0
-        # Se suman todos los costes
-        return sum(costes)
+                cost_list[i] *= cost_list[i + 1]
+                cost_list[i + 1] = 0
+        total_cost = 0
+        for current in cost_list:
+            total_cost += current
+        # Se suman todos los cost_list
+        return total_cost
 
     def calcular_h(self, heuristica: int) -> int:
         """ Metodo que devuelve el valor heuristico del estado. """
@@ -156,16 +162,16 @@ class Estado:
 
     def es_meta(self) -> bool:
         """ Metodo que indica si el estado es un estado meta. """
-        return len(self.sin_asignar) == 0
+        return len(self.por_asignar) == 0
 
     def expandir(self, heuristica: int) -> list:
         """ Metodo que devuelve una lista con los estados obtenidos tras expandir el actual. """
         expandir = []
-        for alumno in self.sin_asignar:
+        for alumno in self.por_asignar:
             if self.futuro_valido(alumno):
                 cola = self.cola.copy()
                 cola.append(alumno)
-                sin_asignar = self.sin_asignar.copy()
+                sin_asignar = self.por_asignar.copy()
                 sin_asignar.remove(alumno)
                 expandir.append(Estado(cola, sin_asignar, self.profundidad + 1, heuristica))
         expandir.sort()
@@ -174,7 +180,7 @@ class Estado:
     def de_dict(self, dict_entrada: dict) -> None:
         """ Metodo que anade a la cola los alumnos de un diccionario. """
         for clave, valor in dict_entrada.items():
-            self.sin_asignar.append(Alumno(clave, valor))
+            self.por_asignar.append(Alumno(clave, valor))
 
     def a_dict(self) -> dict:
         """ Metodo que devuelve la cola de un estado como un diccionario. """
@@ -194,10 +200,10 @@ class Estado:
         """ Metodo que indica si en un futuro estado habra ayudantes suficientes para los alumnos con movilidad
         reducida. """
         movilidad_reducida = 0
-        for i in self.sin_asignar:
+        for i in self.por_asignar:
             if i.movilidad_reducida:
                 movilidad_reducida += 1
-        movilidad_normal = len(self.sin_asignar) - movilidad_reducida
+        movilidad_normal = len(self.por_asignar) - movilidad_reducida
         if not alumno.movilidad_reducida:
             movilidad_normal -= 1
         return movilidad_reducida <= movilidad_normal
