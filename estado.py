@@ -70,7 +70,6 @@ class Estado:
                 costes[i] *= costes[i + 1]
                 costes[i + 1] = 0
         # sumar todos los costes
-        print(sum(costes))
         return sum(costes)
 
     def calcular_h(self) -> int:
