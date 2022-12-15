@@ -211,7 +211,8 @@ class AEstrella:
         estado.de_dict(dict_alumnos)
         self.heuristica = heuristica
         self.meta = Estado()
-        self.tiempo, self.expandidos = 0
+        self.tiempo = 0
+        self.expandidos = 0
         self.abierta = [estado]
 
 
@@ -248,12 +249,6 @@ def leer_entrada(ruta: str) -> dict:
         raise Exception('Fichero de entrada no es correcto.')
     return entrada
 
-
-def escribir_salida(ruta: str, aestrella_ejecutado: AEstrella) -> None:
-    escribir_salida_output(ruta, aestrella_ejecutado)
-    escribir_salida_stat(ruta, aestrella_ejecutado)
-
-
 def escribir_salida_output(ruta: str, aestrella_ejecutado: AEstrella) -> None:
     """  fichero de salida  configuraciones de la cola inicio y  final. """
     output = "INICIAL:\t"
@@ -275,6 +270,7 @@ def escribir_salida_stat(ruta: str, aestrella_ejecutado: AEstrella) -> None:
 if __name__ == '__main__':
     aestrella = AEstrella(leer_entrada(sys.argv[1]), int(sys.argv[2]))
     aestrella.ejecutar()
-    escribir_salida(sys.argv[1], aestrella)
+    escribir_salida_output(sys.argv[1], aestrella)
+    escribir_salida_stat(sys.argv[1], aestrella)
     print(aestrella.meta.a_dict())
 
