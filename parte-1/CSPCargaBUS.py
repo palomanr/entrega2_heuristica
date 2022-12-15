@@ -112,7 +112,6 @@ def filter_ciclio(alumno, datos_alumno):
                 for possible_borther in alumnos:
                     datos_possible_borther = possible_borther.split(",")
                     if (datos_possible_borther[0] == brother_id):
-                        print("hello")
                         if (datos_possible_borther[1] == datos_alumno[1]):
                             alumnos_mov_reducida_ciclo2_no_hermano_ciclo_distinto.append(alumno)
                         else:
@@ -248,85 +247,108 @@ def brothers_together_big_brother_corridor(brother1, brother2):
                     return True
             i = i+2
 
+def fix_dict(solution):
+    correct_keys = []
+    value_keys = []
+    for key , value in solution.items():
+        datos_key = key.split(",")
+        datos_key.pop(1)
+        datos_key.pop(3)
+        str_datos_key = ''.join(datos_key)
+        correct_keys.append(str_datos_key)
+        value_keys.append(value)
+
+    correct_dict = dict(zip(correct_keys, value_keys))
+
+    solution_dict = dict(sorted(correct_dict.items(), key = lambda x:x[1]))
+    print("Solucion: ", solution_dict)
+    return solution_dict     
+
+def create_outputfile(test_path, solutions, solution_dict1, solution_dict2):
+    with open(test_path + ".output", 'w') as f:
+        f.write(" #Número de soluciones: {0} \n".format (len (solutions)))
+        f.write("La primera solucion es: \n")
+        f.write(str(solution_dict1))
+        f.write("\nOtra solucion es: \n")
+        f.write(str(solution_dict2))        
+
 #Here we start the real code and main loop            
 #Creating a CSP problem
 problem = constraint.Problem()
 
 #We filter each student
-for alumno in alumnos:
-    datos_alumno = alumno.split(",")
-    filter_confllictivos_no_hermano(alumno, datos_alumno)
-    filter_confllictivos_o_mov_reducida(alumno, datos_alumno)
-    filter_hermanos_mov_normal(alumno, datos_alumno)
-    filter_confllictivo(alumno, datos_alumno)
-    filter_ciclio(alumno, datos_alumno)
-    filter_ciclo_no_hermanos_mov(alumno, datos_alumno)
-    filter_ciclo_hermanos_mismo_ciclo_mov(alumno, datos_alumno)
-    filter_hermanos_ciclo_distinto_mov(alumno, datos_alumno)
-
-
-# Variables with each domain
-# -----------------------------------------------------------------------
-
-problem.addVariables(alumnos_ciclo1_no_hermanos_mov_normal, dom_ciclo1_no_hermanos_mov_normal)
-problem.addVariables(alumnos_ciclo1_no_hermanos_mov_reducida, dom_ciclo1_no_hermanos_mov_reducida)
-problem.addVariables(alumnos_ciclo2_no_hermanos_mov_normal, dom_ciclo2_no_hermanos_mov_normal)
-problem.addVariables(alumnos_ciclo2_no_hermanos_mov_reducida, dom_ciclo2_no_hermanos_mov_reducida)
-problem.addVariables(alumnos_ciclo1_hermanos_mismo_ciclo_mov_normal, dom_alumnos_ciclo1_hermanos_mismo_ciclo_mov_normal)
-problem.addVariables(alumnos_ciclo1_hermanos_mismo_ciclo_mov_reducida, dom_alumnos_ciclo1_hermanos_mismo_ciclo_mov_reducida)
-problem.addVariables(alumnos_ciclo2_hermanos_mismo_ciclo_mov_normal, dom_alumnos_ciclo2_hermanos_mismo_ciclo_mov_normal)
-problem.addVariables(alumnos_ciclo2_hermanos_mismo_ciclo_mov_reducida, dom_alumnos_ciclo2_hermanos_mismo_ciclo_mov_reducida)
-problem.addVariables(alumnos_hermanos_ciclo_distinto_mov_normal, dom_alumnos_hermanos_ciclo_distinto_mov_normal)
-problem.addVariables(alumnos_hermanos_ciclo_distinto_mov_reducida, dom_alumnos_hermanos_ciclo_distinto_mov_reducida)
-
-# Constraits
-# -------------------------------------------------------------------------
-problem.addConstraint(constraint.AllDifferentConstraint())
-for alumno_mov_reducida_ciclo1 in alumnos_mov_reducida_ciclo1_no_hermano_ciclo_distinto:
+try:
     for alumno in alumnos:
-        problem.addConstraint(next_seat_clear_cicle1, (alumno_mov_reducida_ciclo1, alumno))
-
-for alumno_mov_reducida_ciclo2 in alumnos_mov_reducida_ciclo2_no_hermano_ciclo_distinto:
-    for alumno in alumnos:
-        problem.addConstraint(next_seat_clear_cicle2, (alumno_mov_reducida_ciclo2, alumno))
-
-for alumno_mov_reducida_ciclo1 in alumnos_mov_reducida_hermano_ciclo_distinto:
-    for alumno in alumnos:
-        problem.addConstraint(next_seat_clear_cicle1, (alumno_mov_reducida_ciclo1, alumno))
-
-for alumno_confilctivo in alumnos_conflictivos:
-    for alumno_confilctivo_o_mov_reducida in alumnos_confllictivos_o_mov_reducida:
-        datos_alumno_confilctivo = alumno_confilctivo.split(",")
-        datos_alumno_confilctivo_o_mov_reducida = alumno_confilctivo_o_mov_reducida.split(",")
-        if datos_alumno_confilctivo[4] != datos_alumno_confilctivo_o_mov_reducida[0]:
-            problem.addConstraint(nobody_arround_conflictivo, (alumno_confilctivo, alumno_confilctivo_o_mov_reducida))
-
-for hermano1 in alumnos_hermanos_mov_normal:
-    for hermano2 in alumnos_hermanos_mov_normal:
-        datos_hermano1 = hermano1.split(",")
-        datos_hermano2 = hermano2.split(",")
-        if datos_hermano1[0] == datos_hermano2[4]:
-            if datos_hermano1[1] == datos_hermano2[1]:
-                problem.addConstraint(brothers_together, (hermano1, hermano2))
-            if int(datos_hermano1[1]) > int(datos_hermano2[1]):
-                problem.addConstraint(brothers_together_big_brother_corridor, (hermano1, hermano2))
-            if int(datos_hermano2[1]) > int(datos_hermano1[1]):
-                problem.addConstraint(brothers_together_big_brother_corridor, (hermano2, hermano1))
+        datos_alumno = alumno.split(",")
+        filter_confllictivos_no_hermano(alumno, datos_alumno)
+        filter_confllictivos_o_mov_reducida(alumno, datos_alumno)
+        filter_hermanos_mov_normal(alumno, datos_alumno)
+        filter_confllictivo(alumno, datos_alumno)
+        filter_ciclio(alumno, datos_alumno)
+        filter_ciclo_no_hermanos_mov(alumno, datos_alumno)
+        filter_ciclo_hermanos_mismo_ciclo_mov(alumno, datos_alumno)
+        filter_hermanos_ciclo_distinto_mov(alumno, datos_alumno)
 
 
-# Solution
-# -------------------------------------------------------------------------
-print(problem.getSolution())
-"""
-solutions = problem.getSolutions()
+    # Variables with each domain
+    # -----------------------------------------------------------------------
 
-solution_dict = dict(sorted(problem.getSolution().items(), key = lambda x:x[1]))
-with open(test_path + ".output", 'w') as f:
-    f.write(" #Número de soluciones: {0} \n".format (len (solutions)))
-    f.write(str(solution_dict))
-for element in solution_dict:
-    datos_element = element.split(",")
-    datos_element.pop(1)
-    datos_element.pop(3)
-"""
-#print(problem.getSolutions())
+    problem.addVariables(alumnos_ciclo1_no_hermanos_mov_normal, dom_ciclo1_no_hermanos_mov_normal)
+    problem.addVariables(alumnos_ciclo1_no_hermanos_mov_reducida, dom_ciclo1_no_hermanos_mov_reducida)
+    problem.addVariables(alumnos_ciclo2_no_hermanos_mov_normal, dom_ciclo2_no_hermanos_mov_normal)
+    problem.addVariables(alumnos_ciclo2_no_hermanos_mov_reducida, dom_ciclo2_no_hermanos_mov_reducida)
+    problem.addVariables(alumnos_ciclo1_hermanos_mismo_ciclo_mov_normal, dom_alumnos_ciclo1_hermanos_mismo_ciclo_mov_normal)
+    problem.addVariables(alumnos_ciclo1_hermanos_mismo_ciclo_mov_reducida, dom_alumnos_ciclo1_hermanos_mismo_ciclo_mov_reducida)
+    problem.addVariables(alumnos_ciclo2_hermanos_mismo_ciclo_mov_normal, dom_alumnos_ciclo2_hermanos_mismo_ciclo_mov_normal)
+    problem.addVariables(alumnos_ciclo2_hermanos_mismo_ciclo_mov_reducida, dom_alumnos_ciclo2_hermanos_mismo_ciclo_mov_reducida)
+    problem.addVariables(alumnos_hermanos_ciclo_distinto_mov_normal, dom_alumnos_hermanos_ciclo_distinto_mov_normal)
+    problem.addVariables(alumnos_hermanos_ciclo_distinto_mov_reducida, dom_alumnos_hermanos_ciclo_distinto_mov_reducida)
+
+    # Constraits
+    # -------------------------------------------------------------------------
+    problem.addConstraint(constraint.AllDifferentConstraint())
+    for alumno_mov_reducida_ciclo1 in alumnos_mov_reducida_ciclo1_no_hermano_ciclo_distinto:
+        for alumno in alumnos:
+            problem.addConstraint(next_seat_clear_cicle1, (alumno_mov_reducida_ciclo1, alumno))
+
+    for alumno_mov_reducida_ciclo2 in alumnos_mov_reducida_ciclo2_no_hermano_ciclo_distinto:
+        for alumno in alumnos:
+            problem.addConstraint(next_seat_clear_cicle2, (alumno_mov_reducida_ciclo2, alumno))
+
+    for alumno_mov_reducida_ciclo1 in alumnos_mov_reducida_hermano_ciclo_distinto:
+        for alumno in alumnos:
+            problem.addConstraint(next_seat_clear_cicle1, (alumno_mov_reducida_ciclo1, alumno))
+
+    for alumno_confilctivo in alumnos_conflictivos:
+        for alumno_confilctivo_o_mov_reducida in alumnos_confllictivos_o_mov_reducida:
+            datos_alumno_confilctivo = alumno_confilctivo.split(",")
+            datos_alumno_confilctivo_o_mov_reducida = alumno_confilctivo_o_mov_reducida.split(",")
+            if datos_alumno_confilctivo[4] != datos_alumno_confilctivo_o_mov_reducida[0]:
+                problem.addConstraint(nobody_arround_conflictivo, (alumno_confilctivo, alumno_confilctivo_o_mov_reducida))
+
+    for hermano1 in alumnos_hermanos_mov_normal:
+        for hermano2 in alumnos_hermanos_mov_normal:
+            datos_hermano1 = hermano1.split(",")
+            datos_hermano2 = hermano2.split(",")
+            if datos_hermano1[0] == datos_hermano2[4]:
+                if datos_hermano1[1] == datos_hermano2[1]:
+                    problem.addConstraint(brothers_together, (hermano1, hermano2))
+                if int(datos_hermano1[1]) > int(datos_hermano2[1]):
+                    problem.addConstraint(brothers_together_big_brother_corridor, (hermano1, hermano2))
+                if int(datos_hermano2[1]) > int(datos_hermano1[1]):
+                    problem.addConstraint(brothers_together_big_brother_corridor, (hermano2, hermano1))
+
+
+    # Solution
+    # -------------------------------------------------------------------------
+    solution1 = problem.getSolution()
+    solutions = problem.getSolutions()
+    solution2 = solutions[5]
+
+    solution_dict1 = fix_dict(solution1)
+    solution_dict2 = fix_dict(solution2)
+
+    create_outputfile(test_path, solutions, solution_dict1, solution_dict2)
+
+except:
+    print("Formato invalido")
