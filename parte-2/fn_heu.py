@@ -4,7 +4,7 @@
 from random import randint
 
 
-def distribution_cost(distribution: dict):
+def calcular_g2(distribution: dict):
     distribution_keys = list(distribution.keys())
     len_distribution = len(distribution)
     cost_dict = {}
@@ -126,8 +126,10 @@ def distribution_cost(distribution: dict):
     return total_cost
 
 
-#print(distribution_cost({"3XX": 11, "1CR": 15, "6XX": 15, "5XX": 20, "6XX": 17, "7XX": 18}))
 
+#print(calcular_g2({'4CR': 20, '8XR': 14, '1CX': 32, '7CX': 30, '3XX': 31, '2XX': 29, '5XX': 28, '6XX': 27}))
+
+#print(calcular_g2({'8XR': 14, '3XX': 31, '4CR': 20, '2XX': 29, '5XX': 28, '6XX': 27, '1CX': 32, '7CX': 30}))
 
 
 

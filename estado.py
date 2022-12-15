@@ -38,6 +38,15 @@ class Estado:
         costes = [1] * len(self.cola)
         alumnos_conflictivos = []
         for i in range(len(self.cola)):
+            # Comprobando que no hay un estudiante de movilidad reducida al final de la cola
+            if i == (len(self.cola) - 1) and self.cola[i].movilidad_reducida:
+                return 999
+            # Comprobando que no hay dos estudiantes de movilidad reducida seguidos
+            try:
+                if  self.cola[i].movilidad_reducida and self.self.cola[i+1].movilidad_reducida:
+                    return 999
+            except:
+                pass
             # alumnos_conflictivos duplican el tiempo del alumno actual si está atras
             for j in alumnos_conflictivos:
                 if self.cola[i].asiento > j.asiento:
