@@ -104,6 +104,10 @@ class Estado:
             return self.calcular_h_1()
         if heuristica == 2:
             return self.calcular_h_2()
+        if heuristica == 3:
+            return self.calcular_h_3()
+        if heuristica == 4:
+            return self.calcular_h_4()
         return 0
 
     def calcular_h_1(self) -> int:
@@ -119,7 +123,36 @@ class Estado:
 
     def calcular_h_2(self) -> int:
         """ Metodo que devuelve el valor heuristico del estado usando la heuristica 2. """
-        ...
+        conflictivos = 0
+        movilidad_reducida = 0
+        for e in self.cola:
+            if e.conflictivo:
+                conflictivos += 1
+            if e.movilidad_reducida:
+                movilidad_reducida += 1
+        return len(self.cola) + conflictivos * 3 + movilidad_reducida
+
+    def calcular_h_3(self) -> int:
+        """ Metodo que devuelve el valor heuristico del estado usando la heuristica 3. """
+        conflictivos = 0
+        movilidad_reducida = 0
+        for e in self.cola:
+            if e.conflictivo:
+                conflictivos += 1
+            if e.movilidad_reducida:
+                movilidad_reducida += 1
+        return len(self.cola) + conflictivos + movilidad_reducida * 2
+
+    def calcular_h_4(self) -> int:
+        """ Metodo que devuelve el valor heuristico del estado usando la heuristica 4. """
+        conflictivos = 0
+        movilidad_reducida = 0
+        for e in self.cola:
+            if e.conflictivo:
+                conflictivos += 1
+            if e.movilidad_reducida:
+                movilidad_reducida += 1
+        return len(self.cola) + conflictivos + movilidad_reducida
 
     def es_meta(self) -> bool:
         """ Metodo que indica si el estado es un estado meta. """
