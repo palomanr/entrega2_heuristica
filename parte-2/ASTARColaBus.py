@@ -249,7 +249,7 @@ def leer_entrada(ruta: str) -> dict:
         raise Exception('Fichero de entrada no es correcto.')
     return entrada
 
-def escribir_salida_output(ruta: str, aestrella_ejecutado: AEstrella) -> None:
+def escribir_salida(ruta: str, aestrella_ejecutado: AEstrella) -> None:
     """  fichero de salida  configuraciones de la cola inicio y  final. """
     output = "INICIAL:\t"
     with open(ruta) as fichero:
@@ -258,9 +258,6 @@ def escribir_salida_output(ruta: str, aestrella_ejecutado: AEstrella) -> None:
     ruta_salida = ruta[:-5] + '-' + str(aestrella_ejecutado.heuristica) + '.output'
     with open(ruta_salida, 'w') as fichero:
         fichero.write(output)
-
-
-def escribir_salida_stat(ruta: str, aestrella_ejecutado: AEstrella) -> None:
     """  fichero de salida estadisticas """
     ruta_salida = ruta[:-5] + '-' + str(aestrella_ejecutado.heuristica) + '.stat'
     with open(ruta_salida, 'w') as fichero:
@@ -270,7 +267,6 @@ def escribir_salida_stat(ruta: str, aestrella_ejecutado: AEstrella) -> None:
 if __name__ == '__main__':
     aestrella = AEstrella(leer_entrada(sys.argv[1]), int(sys.argv[2]))
     aestrella.ejecutar()
-    escribir_salida_output(sys.argv[1], aestrella)
-    escribir_salida_stat(sys.argv[1], aestrella)
+    escribir_salida(sys.argv[1], aestrella)
     print(aestrella.meta.a_dict())
 
