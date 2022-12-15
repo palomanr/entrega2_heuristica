@@ -15,6 +15,7 @@ class Estado:
         self.g = self.calcular_g()
         self.h = self.calcular_h()
         self.f = self.g + self.h
+        self.nodos_exp = 0
 
     def __lt__(self, other):
         return self.f < other.f
