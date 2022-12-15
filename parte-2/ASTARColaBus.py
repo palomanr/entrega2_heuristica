@@ -126,7 +126,7 @@ def distribution_cost(distribution: dict):
     return total_cost
 
 
-print(distribution_cost({"3XX": 11, "1CR": 15, "6XX": 15, "5XX": 20, "6XX": 17, "7XX": 18}))
+#print(distribution_cost({"3XX": 11, "1CR": 15, "6XX": 15, "5XX": 20, "6XX": 17, "7XX": 18}))
 
 
 
