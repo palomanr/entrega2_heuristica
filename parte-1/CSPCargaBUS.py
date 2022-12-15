@@ -2,13 +2,21 @@ import constraint
 import sys
 import numpy as np
 
-#Obtain path from argument in bash
-test_path = str(sys.argv[1])
+#First we obtain path from argument in bash
+try:
+    test_path = str(sys.argv[1])
+except:
+    print("El path indicado es inválido")
 
-#Get students from .txt file
-alumnos = open(test_path, 'r').read().splitlines()
+try:
+    alumnos = open(test_path, 'r').read().splitlines()
 
-#Global lists of each type of student
+except:
+    print("Archivo corrompido o defectuoso")
+
+
+#Global lists of each type of student (Self Explained)
+#Lists for restricctions
 alumnos_conflictivos = []
 alumnos_conflictivos_no_hermano = []
 alumnos_mov_reducida_ciclo1_no_hermano_ciclo_distinto = []
@@ -17,24 +25,19 @@ alumnos_confllictivos_o_mov_reducida = []
 alumnos_hermanos_mov_normal = []
 alumnos_mov_reducida_hermano_ciclo_distinto = []
 
+#Lists for domains
 alumnos_ciclo1_no_hermanos_mov_normal = []
 alumnos_ciclo1_no_hermanos_mov_reducida = []
-
 alumnos_ciclo2_no_hermanos_mov_normal = []
 alumnos_ciclo2_no_hermanos_mov_reducida = []
-
 alumnos_ciclo1_hermanos_mismo_ciclo_mov_normal = []
 alumnos_ciclo1_hermanos_mismo_ciclo_mov_reducida = []
-
 alumnos_ciclo2_hermanos_mismo_ciclo_mov_normal = []
 alumnos_ciclo2_hermanos_mismo_ciclo_mov_reducida = []
-
 alumnos_hermanos_ciclo_distinto_mov_normal = []
 alumnos_hermanos_ciclo_distinto_mov_reducida = []
 
-
-
-#Generate bus
+#Generate bus as an array
 array_asientos_bus = np.array([
                         [1,2,3,4], [5,6,7,8], 
                         [9, 10, 11, 12], [13, 14, 15, 16],
@@ -42,7 +45,7 @@ array_asientos_bus = np.array([
                         [25, 26, 27, 28], [29, 30, 31, 32]])
 
 
-#Filter each domain from main bus
+#Filter each domain from main bus arrangment
 dom_ciclo1_no_hermanos_mov_normal = np.concatenate([array_asientos_bus[0], array_asientos_bus[1], array_asientos_bus[2], array_asientos_bus[3]]).tolist()
 dom_ciclo1_no_hermanos_mov_reducida = np.concatenate([array_asientos_bus[0], array_asientos_bus[3]]).tolist()
 
@@ -62,13 +65,15 @@ dom_alumnos_hermanos_ciclo_distinto_mov_reducida = np.concatenate([array_asiento
 
 
 
-#All filter functions that add each student to tehir corresponding list
+#All filter functions that add each student to their corresponding list for domain and restricctions
 def filter_confllictivos_no_hermano(alumno, datos_alumno):
+    #Students conflict with no brother
     if datos_alumno[2] == 'C':
         if int(datos_alumno[4]) == 0:
             alumnos_conflictivos_no_hermano.append(alumno)
 
 def filter_hermanos_mov_normal(alumno, datos_alumno):
+    #Students btother with regular mobility
     if datos_alumno[3] == 'X':
         brother_id = datos_alumno[4]
         for possible_borther in alumnos:
@@ -78,10 +83,12 @@ def filter_hermanos_mov_normal(alumno, datos_alumno):
                     alumnos_hermanos_mov_normal.append(alumno)
 
 def filter_confllictivos_o_mov_reducida(alumno, datos_alumno):
+    #conflict or reduced movility students
     if (datos_alumno[2] == 'C') or (datos_alumno[3] == 'R'):
             alumnos_confllictivos_o_mov_reducida.append(alumno)
 
 def filter_ciclio(alumno, datos_alumno):
+    #Students cycle filter
     if datos_alumno[1]  == '1':
         if datos_alumno[3] == 'R':
             if (int(datos_alumno[4]) == 0):
@@ -240,10 +247,12 @@ def brothers_together_big_brother_corridor(brother1, brother2):
                 if((brother1 == asiento[i]) and (brother2 == asiento[i+1])):
                     return True
             i = i+2
+
+#Here we start the real code and main loop            
 #Creating a CSP problem
 problem = constraint.Problem()
 
-
+#We filter each student
 for alumno in alumnos:
     datos_alumno = alumno.split(",")
     filter_confllictivos_no_hermano(alumno, datos_alumno)
@@ -256,21 +265,17 @@ for alumno in alumnos:
     filter_hermanos_ciclo_distinto_mov(alumno, datos_alumno)
 
 
-# variables
+# Variables with each domain
 # -----------------------------------------------------------------------
 
 problem.addVariables(alumnos_ciclo1_no_hermanos_mov_normal, dom_ciclo1_no_hermanos_mov_normal)
 problem.addVariables(alumnos_ciclo1_no_hermanos_mov_reducida, dom_ciclo1_no_hermanos_mov_reducida)
-
 problem.addVariables(alumnos_ciclo2_no_hermanos_mov_normal, dom_ciclo2_no_hermanos_mov_normal)
 problem.addVariables(alumnos_ciclo2_no_hermanos_mov_reducida, dom_ciclo2_no_hermanos_mov_reducida)
-
 problem.addVariables(alumnos_ciclo1_hermanos_mismo_ciclo_mov_normal, dom_alumnos_ciclo1_hermanos_mismo_ciclo_mov_normal)
 problem.addVariables(alumnos_ciclo1_hermanos_mismo_ciclo_mov_reducida, dom_alumnos_ciclo1_hermanos_mismo_ciclo_mov_reducida)
-
 problem.addVariables(alumnos_ciclo2_hermanos_mismo_ciclo_mov_normal, dom_alumnos_ciclo2_hermanos_mismo_ciclo_mov_normal)
 problem.addVariables(alumnos_ciclo2_hermanos_mismo_ciclo_mov_reducida, dom_alumnos_ciclo2_hermanos_mismo_ciclo_mov_reducida)
-
 problem.addVariables(alumnos_hermanos_ciclo_distinto_mov_normal, dom_alumnos_hermanos_ciclo_distinto_mov_normal)
 problem.addVariables(alumnos_hermanos_ciclo_distinto_mov_reducida, dom_alumnos_hermanos_ciclo_distinto_mov_reducida)
 
@@ -312,5 +317,16 @@ for hermano1 in alumnos_hermanos_mov_normal:
 # Solution
 # -------------------------------------------------------------------------
 print(problem.getSolution())
+"""
+solutions = problem.getSolutions()
 
+solution_dict = dict(sorted(problem.getSolution().items(), key = lambda x:x[1]))
+with open(test_path + ".output", 'w') as f:
+    f.write(" #Número de soluciones: {0} \n".format (len (solutions)))
+    f.write(str(solution_dict))
+for element in solution_dict:
+    datos_element = element.split(",")
+    datos_element.pop(1)
+    datos_element.pop(3)
+"""
 #print(problem.getSolutions())
