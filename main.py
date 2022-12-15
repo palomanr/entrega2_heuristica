@@ -5,6 +5,8 @@ import os
 from alumno import Alumno
 from estado import Estado
 from grafo import Grafo
+import time
+from fn_heu2 import Calcular_g2
 
 
 def leer_entrada(ruta: str) -> dict:
@@ -27,4 +29,12 @@ if __name__ == '__main__':
     estado = Estado()
     estado.de_dict(leer_entrada(os.getcwd() + "/test"))
     grafo = Grafo(estado)
+    start = time.time()
+    result = grafo.a_estrella().a_dict()
     print(grafo.a_estrella().a_dict())
+    end = time.time()
+    tiempo_total = end - start
+    print("\nTiempo total: ", tiempo_total)
+    print("\nCoste Total: ", Calcular_g2.calculate(grafo.a_estrella().a_dict()))
+
+
